@@ -37,7 +37,16 @@ async function scrapeJobDescriptions(listings, page) {
   for (var i = 0; i < listings.length; i++) {
     await page.goto(listings[i].url);
     const html = await page.content();
+    const $ = cheerio.load(html);
+    const jobDescription = $("#postingbody").text();
+    listings[i].jobDescription = jobDescription;
+    console.log(listings[i].jobDescription);
+    await sleep(1000); //1 second sleep
   }
+}
+
+async function sleep(miliseconds) {
+  return new Promise(resolve => setTimeout(resolve, miliseconds));
 }
 
 async function main() {
