@@ -1,6 +1,6 @@
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
-
+//craigslistuser:SuperStrongPassword1
 const scrapingResults = [
   {
     title: "Entry Level Software Engineer - C or C++",
@@ -39,8 +39,11 @@ async function scrapeJobDescriptions(listings, page) {
     const html = await page.content();
     const $ = cheerio.load(html);
     const jobDescription = $("#postingbody").text();
+    const compensation = $("p.attrgroup > span:nth-child(1) > b").text();
     listings[i].jobDescription = jobDescription;
+    listings[i].compensation = compensation;
     console.log(listings[i].jobDescription);
+    console.log(listings[i].compensation);
     await sleep(1000); //1 second sleep
   }
 }
