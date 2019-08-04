@@ -1,5 +1,6 @@
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
+const mongoose = require("mongoose");
 //craigslistuser:SuperStrongPassword1
 const scrapingResults = [
   {
@@ -13,6 +14,14 @@ const scrapingResults = [
     compensation: "Up to US$0.00 per year"
   }
 ];
+
+async function connectToMongoDb() {
+  await mongoose.connect(
+    "mongodb://craigslistuser:SuperStrongPassword1@ds259377.mlab.com:59377/craigslistlistings",
+    { useNewUrlParser: true }
+  );
+  console.log("connected to mongodb");
+}
 
 async function scrapeListings(page) {
   await page.goto(
@@ -53,6 +62,7 @@ async function sleep(miliseconds) {
 }
 
 async function main() {
+  await connectToMongoDb();
   const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
   const listings = await scrapeListings(page);
