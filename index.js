@@ -1,6 +1,7 @@
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
 const mongoose = require("mongoose");
+const Listing = require("./model/Listing");
 //craigslistuser:SuperStrongPassword1
 const scrapingResults = [
   {
@@ -33,10 +34,16 @@ async function scrapeListings(page) {
     .map((index, element) => {
       const titleElement = $(element).find(".result-title");
       const timeElement = $(element).find(".result-date");
+      const hoodElement = $(element).find(".result-hood");
       const title = $(titleElement).text();
+      const neighborhood = $(hoodElement)
+        .text()
+        .trim()
+        .replace("(", "")
+        .replace(")", "");
       const url = $(titleElement).attr("href");
       const datePosted = new Date($(timeElement).attr("datetime"));
-      return { title, url, datePosted };
+      return { title, url, datePosted, neighborhood };
     })
     .get();
   return listings;
@@ -53,6 +60,8 @@ async function scrapeJobDescriptions(listings, page) {
     listings[i].compensation = compensation;
     console.log(listings[i].jobDescription);
     console.log(listings[i].compensation);
+    const listingModel = new Listing(listings[i]);
+    await listingModel.save();
     await sleep(1000); //1 second sleep
   }
 }
